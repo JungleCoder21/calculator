@@ -1,0 +1,8 @@
+﻿  calculator02buggy.cpp
+D:\Carti\C++\Principles and practice using c++\Exercises\Chapter 6\calculator02buggy\calculator02buggy.cpp(166,23): warning C4018: '<': signed/unsigned mismatch
+D:\Carti\C++\Principles and practice using c++\Exercises\Chapter 6\calculator02buggy\calculator02buggy.cpp(175,23): warning C4018: '<': signed/unsigned mismatch
+D:\Carti\C++\Principles and practice using c++\Exercises\Chapter 6\calculator02buggy\calculator02buggy.cpp(361,23): warning C4018: '<': signed/unsigned mismatch
+D:\Carti\C++\Principles and practice using c++\Exercises\Chapter 6\calculator02buggy\calculator02buggy.cpp(170): warning C4715: 'get_value': not all control paths return a value
+D:\Carti\C++\Principles and practice using c++\Exercises\Chapter 6\calculator02buggy\calculator02buggy.cpp(141): warning C4715: 'Token_stream::get': not all control paths return a value
+D:\Carti\C++\Principles and practice using c++\Exercises\Chapter 6\calculator02buggy\calculator02buggy.cpp(228): warning C4715: 'primary': not all control paths return a value
+  calculator02buggy.vcxproj -> D:\Carti\C++\Principles and practice using c++\Exercises\Chapter 6\calculator02buggy\Debug\calculator02buggy.exe
