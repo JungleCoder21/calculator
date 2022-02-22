@@ -47,6 +47,9 @@ const string sqrtkey = "sqrt";
 const string constkey = "const";
 const char const_op = 'c';
 
+const char pow_op = 'p';
+const string powkey = "pow";
+
 //------------------------------------------------------------------------------
 
 class Token_stream {
@@ -113,6 +116,7 @@ Token Token_stream::get()
     case '!':
     case '%':
     case '=':
+    case ',':
         return Token(ch);        // let each character represent itself
     case '.':   //a floating point literal can start with a dot
     case '0': case '1': case '2': case '3': case '4':
@@ -134,6 +138,7 @@ Token Token_stream::get()
             if(s==declkey) return Token(let);  //declaration keyword
             if(s==sqrtkey) return Token(sqrt_op);
             if (s == constkey) return Token(const_op);
+            if (s == powkey) return Token(pow_op);
             return Token(name,s);
         }
         error("Bad token");
@@ -258,6 +263,13 @@ double term()
             t = ts.get();
             break;
         }
+        case ',':
+        {
+            int i1 = narrow_cast<int>(term());
+            left = pow(left, i1);
+            t = ts.get();
+            break;
+        }
         default:
             ts.putback(t);     // put t back into the token stream
             return left;
@@ -316,6 +328,16 @@ double expression()
 
 //------------------------------------------------------------------------------
 
+double power() {
+    //assume we have seen pow
+    Token t = ts.get();
+    if (t.kind != '(') error("'(' expected after pow call");
+    double d = expression();
+    t = ts.get();
+    if(t.kind != ')') error("'(' expected to finish pow declaration");
+    return d;
+}
+
 double statement() {
     Token t = ts.get();
     switch (t.kind) {
@@ -350,6 +372,8 @@ double statement() {
     }
     case const_op:
         return declare_const();
+    case pow_op:
+        return power();
     default:
         ts.putback(t);
         return expression();
