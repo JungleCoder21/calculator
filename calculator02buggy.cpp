@@ -50,6 +50,8 @@ const char const_op = 'c';
 const char pow_op = 'p';
 const string powkey = "pow";
 
+const char help = 'H';
+
 //------------------------------------------------------------------------------
 
 class Token_stream {
@@ -102,7 +104,7 @@ Token Token_stream::get()
     char ch;
 //    cin >> ch;    // note that >> skips whitespace (space, newline, tab, etc.)
     cin.get(ch);
-    while (isspace(ch)) {
+    while (isspace(ch)) {//discard whitespace but keep newline
         if (ch == '\n')
             break;
         else
@@ -125,7 +127,7 @@ Token Token_stream::get()
     case '%':
     case '=':
     case ',':
-//    case '\n':
+    case 'H':
         return Token(ch);        // let each character represent itself
     case '.':   //a floating point literal can start with a dot
     case '0': case '1': case '2': case '3': case '4':
@@ -456,6 +458,16 @@ void clean_up_mess() {  //naive :)))))))
     ts.ignore(print);
 }
 
+
+void help_message() {
+    cout << "pow(x,y) for x to power y\n"
+        << "sqrt(exp)\n"
+        << "define a variable: LET var_name = value\n"
+        << "use = to change var_name value after definition\n"
+        << "const var_name = value defines a constant var\n";
+}
+
+
 void calculate(){
     while (cin) {
         try {
@@ -463,6 +475,10 @@ void calculate(){
             Token t = ts.get();
             while (t.kind == print) t = ts.get(); //first discard all prints
             if (t.kind == quit) return; //return
+            if (t.kind == help) {
+                help_message();
+                continue;
+            }
             ts.putback(t);
             cout << result << statement() << endl;
         }
@@ -479,8 +495,9 @@ try
     cout << "Welcome to our simple calculator!" << '\n'
         << "Please enter expressions using floating-point numbers." << '\n'
         << "The available operators are: +,-,*,/" << '\n'
-        << "To print a result, type = after your expression" << '\n'
-        << "To exit, type x" << '\n';
+        << "To print a result, type ; after your expression or hit enter" << '\n'
+        << "To exit, type x" << '\n'
+        << "Type 'H' to see the help menu" << '\n';
 
     //predefine names
 
