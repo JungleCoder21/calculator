@@ -164,9 +164,22 @@ void Token_stream::ignore(char c) {
 //------------------------------------------------------------------------------
 
 Token_stream ts;        // provides get() and putback() 
-vector<Variable> var_table;
 
-double get_value(string s) {
+struct Symbol_table {
+    vector<Variable> var_table;
+
+    double get_value(string s);
+    void set_value(string s, double d);
+    bool is_declared(string s);
+    double define_name(string var, double val, char type);
+};
+
+Symbol_table st;
+
+
+
+
+double Symbol_table::get_value(string s) {
     //return the value of the variable named s
     for (int i = 0; i < var_table.size(); ++i) {
         if (var_table[i].name == s) return var_table[i].value;
@@ -174,7 +187,7 @@ double get_value(string s) {
     error("get: undefined variable ", s);
 }
 
-void set_value(string s, double d) {
+void Symbol_table::set_value(string s, double d) {
     //set the Variable named s to d
     //== give a Variable a new value
     for (int i = 0; i < var_table.size(); ++i) {
@@ -226,7 +239,7 @@ double primary()
     case '+':
         return primary();
     case name:
-        return get_value(t.name);
+        return st.get_value(t.name);
     default:
         error("primary expected");
     }
@@ -352,8 +365,8 @@ double statement() {
             t = ts.get();
             if (t.kind == '=') {
                 double d2 = expression();
-                set_value(s, d2);
-                return get_value(s);
+                st.set_value(s, d2);
+                return st.get_value(s);
             }
             ts.putback(t);
         }
@@ -380,14 +393,14 @@ double statement() {
     }
 }
 
-bool is_declared(string var) {
+bool Symbol_table::is_declared(string var) {
     //is var already declared in var_table?
     for (int i = 0; i < var_table.size(); ++i)
         if (var_table[i].name == var) return true;
     return false;
 }
 
-double define_name(string var, double val, char type) {
+double Symbol_table::define_name(string var, double val, char type) {
     //add(var,val) to var_table
     if (is_declared(var)) error(var, " declared twice");
     var_table.push_back(Variable(var, val,type));
@@ -408,7 +421,7 @@ double declaration() {
     if (t2.kind != '=') error("= missing in delcaration of ", var_name);
 
     double d = expression();
-    define_name(var_name, d,'v');
+    st.define_name(var_name, d,'v');
     return d;
 }
 
@@ -426,7 +439,7 @@ double declare_const() {
     if (t2.kind != '=') error("= missing in delcaration of ", var_name);
 
     double d = expression();
-    define_name(var_name, d, 'c');
+    st.define_name(var_name, d, 'c');
     return d;
 }
 
@@ -462,8 +475,8 @@ try
 
     //predefine names
 
-    define_name("pi", 3.1415926535,'c');
-    define_name("e", 2.7182818284,'c');
+    st.define_name("pi", 3.1415926535,'c');
+    st.define_name("e", 2.7182818284,'c');
 
 
     calculate();
