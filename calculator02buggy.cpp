@@ -100,9 +100,17 @@ Token Token_stream::get()
     }
 
     char ch;
-    cin >> ch;    // note that >> skips whitespace (space, newline, tab, etc.)
-
+//    cin >> ch;    // note that >> skips whitespace (space, newline, tab, etc.)
+    cin.get(ch);
+    while (isspace(ch)) {
+        if (ch == '\n')
+            break;
+        else
+            cin.get(ch);
+    }
     switch (ch) {
+    case'\n':
+        return Token(print);
     case print:    // for "print"
     case quit:    // for "quit"
     case '(':
@@ -117,6 +125,7 @@ Token Token_stream::get()
     case '%':
     case '=':
     case ',':
+//    case '\n':
         return Token(ch);        // let each character represent itself
     case '.':   //a floating point literal can start with a dot
     case '0': case '1': case '2': case '3': case '4':

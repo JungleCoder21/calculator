@@ -1,8 +1,8 @@
 ﻿  calculator02buggy.cpp
-D:\Carti\C++\Principles and practice using c++\Exercises\Chapter 6\calculator02buggy\calculator02buggy.cpp(184,23): warning C4018: '<': signed/unsigned mismatch
 D:\Carti\C++\Principles and practice using c++\Exercises\Chapter 6\calculator02buggy\calculator02buggy.cpp(193,23): warning C4018: '<': signed/unsigned mismatch
-D:\Carti\C++\Principles and practice using c++\Exercises\Chapter 6\calculator02buggy\calculator02buggy.cpp(398,23): warning C4018: '<': signed/unsigned mismatch
-D:\Carti\C++\Principles and practice using c++\Exercises\Chapter 6\calculator02buggy\calculator02buggy.cpp(188): warning C4715: 'Symbol_table::get_value': not all control paths return a value
-D:\Carti\C++\Principles and practice using c++\Exercises\Chapter 6\calculator02buggy\calculator02buggy.cpp(146): warning C4715: 'Token_stream::get': not all control paths return a value
-D:\Carti\C++\Principles and practice using c++\Exercises\Chapter 6\calculator02buggy\calculator02buggy.cpp(246): warning C4715: 'primary': not all control paths return a value
+D:\Carti\C++\Principles and practice using c++\Exercises\Chapter 6\calculator02buggy\calculator02buggy.cpp(202,23): warning C4018: '<': signed/unsigned mismatch
+D:\Carti\C++\Principles and practice using c++\Exercises\Chapter 6\calculator02buggy\calculator02buggy.cpp(407,23): warning C4018: '<': signed/unsigned mismatch
+D:\Carti\C++\Principles and practice using c++\Exercises\Chapter 6\calculator02buggy\calculator02buggy.cpp(197): warning C4715: 'Symbol_table::get_value': not all control paths return a value
+D:\Carti\C++\Principles and practice using c++\Exercises\Chapter 6\calculator02buggy\calculator02buggy.cpp(155): warning C4715: 'Token_stream::get': not all control paths return a value
+D:\Carti\C++\Principles and practice using c++\Exercises\Chapter 6\calculator02buggy\calculator02buggy.cpp(255): warning C4715: 'primary': not all control paths return a value
   calculator02buggy.vcxproj -> D:\Carti\C++\Principles and practice using c++\Exercises\Chapter 6\calculator02buggy\Debug\calculator02buggy.exe
