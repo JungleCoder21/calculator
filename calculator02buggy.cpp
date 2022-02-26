@@ -18,6 +18,7 @@
 */
 
 #include "C:\Users\Coserea\Desktop\test c++\lib_facilities\std_lib_facilities.h"
+#include <fstream>
 
 //------------------------------------------------------------------------------
 
@@ -56,7 +57,7 @@ const char help = 'H';
 
 class Token_stream {
 public:
-    Token_stream();   // make a Token_stream that reads from cin
+    Token_stream(istream& stream);   // make a Token_stream that reads from cin
     Token get();      // get a Token (get() is defined elsewhere)
     void putback(Token t);    // put a Token back
     void ignore(char c);  //discard characters up to and including a c
@@ -76,7 +77,7 @@ public:
 //------------------------------------------------------------------------------
 
 // The constructor just sets full to indicate that the buffer is empty:
-Token_stream::Token_stream()
+Token_stream::Token_stream(istream& stream)
     :full(false), buffer(0)    // no Token in buffer
 {
 }
@@ -174,8 +175,6 @@ void Token_stream::ignore(char c) {
 
 //------------------------------------------------------------------------------
 
-Token_stream ts;        // provides get() and putback() 
-
 struct Symbol_table {
     vector<Variable> var_table;
 
@@ -217,28 +216,28 @@ void Symbol_table::set_value(string s, double d) {
 
 //------------------------------------------------------------------------------
 
-double expression();    // declaration so that primary() can call expression()
-double term();
-double factorial();
-double declaration();
-double declare_const();
+double expression(Token_stream& ts);    // declaration so that primary() can call expression()
+double term(Token_stream& ts);
+double factorial(Token_stream& ts);
+double declaration(Token_stream& ts);
+double declare_const(Token_stream& ts);
 //------------------------------------------------------------------------------
 
 // deal with numbers and parentheses
-double primary()
+double primary(Token_stream& ts)
 {
     Token t = ts.get();
     switch (t.kind) {
     case '(':    // handle '(' expression ')'
     {
-        double d = expression();
+        double d = expression(ts);
         t = ts.get();
         if (t.kind != ')') error("')' expected");
             return d;
     }
     case '{':
     {
-        double d = expression();
+        double d = expression(ts);
         t = ts.get();
         if (t.kind != '}') error("'}' expected");
         return d;
@@ -246,9 +245,9 @@ double primary()
     case number:
         return t.value;  // return the number's value
     case '-':
-        return -primary();
+        return -primary(ts);
     case '+':
-        return primary();
+        return primary(ts);
     case name:
         return st.get_value(t.name);
     default:
@@ -259,20 +258,20 @@ double primary()
 //------------------------------------------------------------------------------
 
 // deal with *, /, and %
-double term()
+double term(Token_stream& ts)
 {
-    double left = factorial();
+    double left = factorial(ts);
     Token t = ts.get();        // get the next token from token stream
 
     while (true) {
         switch (t.kind) {
         case '*':
-            left *= factorial();
+            left *= factorial(ts);
             t = ts.get();
             break;
         case '/':
         {
-            double d = factorial();
+            double d = factorial(ts);
             if (d == 0) error("divide by zero");
             left /= d;
             t = ts.get();
@@ -281,7 +280,7 @@ double term()
         case '%':
         {
             int i1 = narrow_cast<int>(left);
-            int i2 = narrow_cast<int>(term());
+            int i2 = narrow_cast<int>(term(ts));
             if (i2 == 0) error("%: divide by zero");
             left = i1 % i2;
             t = ts.get();
@@ -289,7 +288,7 @@ double term()
         }
         case ',':
         {
-            int i1 = narrow_cast<int>(term());
+            int i1 = narrow_cast<int>(term(ts));
             left = pow(left, i1);
             t = ts.get();
             break;
@@ -301,8 +300,8 @@ double term()
     }
 }
 
-double factorial() {
-    double left = primary();
+double factorial(Token_stream& ts) {
+    double left = primary(ts);
     Token t = ts.get();
     switch (t.kind) {
     case'!':
@@ -328,19 +327,19 @@ double factorial() {
 //------------------------------------------------------------------------------
 
 // deal with + and -
-double expression()
+double expression(Token_stream& ts)
 {
-    double left = term();      // read and evaluate a Term
+    double left = term(ts);      // read and evaluate a Term
     Token t = ts.get();        // get the next token from token stream
 
     while (true) {
         switch (t.kind) {
         case '+':
-            left += term();    // evaluate Term and add
+            left += term(ts);    // evaluate Term and add
             t = ts.get();
             break;
         case '-':
-            left -= term();    // evaluate Term and subtract
+            left -= term(ts);    // evaluate Term and subtract
             t = ts.get();
             break;
         default:
@@ -352,30 +351,30 @@ double expression()
 
 //------------------------------------------------------------------------------
 
-double power() {
+double power(Token_stream& ts) {
     //assume we have seen pow
     Token t = ts.get();
     if (t.kind != '(') error("'(' expected after pow call");
-    double d = expression();
+    double d = expression(ts);
     t = ts.get();
     if(t.kind != ')') error("'(' expected to finish pow declaration");
     return d;
 }
 
-double statement() {
+double statement(Token_stream& ts) {
     Token t = ts.get();
     switch (t.kind) {
     case let:
-        return declaration();
+        return declaration(ts);
     case name: 
     {
         string s = t.name;
         ts.putback(t);
-        double d = expression();
+        double d = expression(ts);
         if (cin.peek()) {
             t = ts.get();
             if (t.kind == '=') {
-                double d2 = expression();
+                double d2 = expression(ts);
                 st.set_value(s, d2);
                 return st.get_value(s);
             }
@@ -388,19 +387,19 @@ double statement() {
     {
         Token t2 = ts.get();
         if (t2.kind != '(') error("'(' expected after sqrt call");
-        double d = expression();
+        double d = expression(ts);
         t2 = ts.get();
         if (t2.kind != ')') error("')' expected after sqrt call");
         if (d < 0) error("Attempt to take square root of negative number!");
         return sqrt(d);
     }
     case const_op:
-        return declare_const();
+        return declare_const(ts);
     case pow_op:
-        return power();
+        return power(ts);
     default:
         ts.putback(t);
-        return expression();
+        return expression(ts);
     }
 }
 
@@ -418,7 +417,7 @@ double Symbol_table::define_name(string var, double val, char type) {
     return val;
 }
 
-double declaration() {
+double declaration(Token_stream& ts) {
     //assume we have seen "let"
     //handle: name = expression
     //declare a variable called "name" with the initial value "expression"
@@ -431,13 +430,13 @@ double declaration() {
     //era != '='
     if (t2.kind != '=') error("= missing in delcaration of ", var_name);
 
-    double d = expression();
+    double d = expression(ts);
     st.define_name(var_name, d,'v');
     return d;
 }
 
 
-double declare_const() {
+double declare_const(Token_stream& ts) {
     //assume we have seen const
     //handle name = expression
     //declare a constant called name with the initial value expression
@@ -449,12 +448,12 @@ double declare_const() {
     //era != '='
     if (t2.kind != '=') error("= missing in delcaration of ", var_name);
 
-    double d = expression();
+    double d = expression(ts);
     st.define_name(var_name, d, 'c');
     return d;
 }
 
-void clean_up_mess() {  //naive :)))))))
+void clean_up_mess(Token_stream& ts) {  //naive :)))))))
     ts.ignore(print);
 }
 
@@ -469,6 +468,7 @@ void help_message() {
 
 
 void calculate(){
+    Token_stream ts(std::cin);
     while (cin) {
         try {
             cout << prompt;
@@ -480,11 +480,11 @@ void calculate(){
                 continue;
             }
             ts.putback(t);
-            cout << result << statement() << endl;
+            cout << result << statement(ts) << endl;
         }
         catch (std::exception& e) {
             cerr << e.what() << endl;   //write error message
-            clean_up_mess();
+            clean_up_mess(ts);
         }
     }
 }
